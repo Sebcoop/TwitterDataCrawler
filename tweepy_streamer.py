@@ -96,20 +96,29 @@ class TwitterListener(StreamListener):
 
 	def __init__(self, fetched_tweets_filename):
 		self.fetched_tweets_filename = fetched_tweets_filename
-		duplicateTweetCount = 0
+		self.duplicateTweetCount = 0
 
 
 	# takes in data, prints it and writes it to our json file
 	def on_data(self, data):
 		tweet = json.loads(data)
 
+
+		#tf.close()
+
 		try:
 			collection.insert_one(tweet)
 			print("User:", tweet["id_str"], " added Tweet:\n", tweet["text"], "\n")
+
+			with open(self.fetched_tweets_filename, 'a') as tf:
+				tf.write(str(tweet, "\n"))
+
+			'''
+			# write to tweets.json for marker
+			'''
 			return True
 		except:
 			print("duplicate tweet found")
-
 			self.duplicateTweetCount += 1
 
 	# print error which is passed in through status parameter
